@@ -17,7 +17,7 @@ TMC2130Stepper TMC2130 = TMC2130Stepper(EN_PIN, DIR_PIN, STEP_PIN, CS_PIN);
 void setup() {
   Serial.begin(115200);
   TMC2130.begin();
-  TMC2130.SilentStepStick2130(600);
+  TMC2130.SilentStepStick2130(1000);
   TMC2130.stealthChop(1);
   TMC2130.microsteps(8);
 
@@ -28,13 +28,17 @@ void loop() {
 
   if (Serial.available() > 0) {
     Serial.println("Reading");
-    while (Serial.available() > 0) {
-      Serial.read();
+    String msg = Serial.readStringUntil('\n');
+    Serial.println("Read: " + msg);
+    if (msg == "run") {
+      running = true;
+    } else if (msg == "stop") {
+      running = false;
     }
-    running = !running;
   }
 
   if (running) {
+    TMC2130.
     digitalWrite(STEP_PIN, HIGH);
     delayMicroseconds(100);
     digitalWrite(STEP_PIN, LOW);
@@ -50,7 +54,7 @@ void loop() {
         TMC2130.shaft_dir(1);
       }
       dir = !dir;
-      Serial.println(TMC2130.GCONF(), BIN);
+      //Serial.println(TMC2130.GCONF(), BIN);
       last_time = ms;
     }
   }
